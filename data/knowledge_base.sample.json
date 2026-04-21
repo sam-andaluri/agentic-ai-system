@@ -1,0 +1,170 @@
+{
+  "issues": [
+    {
+      "issue_id": "XID_48",
+      "description": "Double-bit ECC error in GPU memory.",
+      "severity": "P1",
+      "category": "hardware",
+      "keywords": [
+        "xid 48",
+        "double-bit ecc",
+        "memory corruption",
+        "uncorrectable ecc"
+      ],
+      "typical_resolution": "Drain the node, run DCGM diagnostics, and replace the affected GPU if diagnostics fail or the error recurs.",
+      "false_positive_rate": 0.05,
+      "confidence_notes": "A DBE is strongly correlated with hardware failure when temperatures are otherwise normal."
+    },
+    {
+      "issue_id": "XID_13",
+      "description": "Graphics engine exception that often maps to a driver or CUDA stack mismatch.",
+      "severity": "P2",
+      "category": "software",
+      "keywords": [
+        "xid 13",
+        "graphics engine",
+        "driver fault",
+        "cuda compatibility"
+      ],
+      "typical_resolution": "Restart the GPU driver stack, review CUDA and driver compatibility, and re-run the workload with debug logging enabled.",
+      "false_positive_rate": 0.3,
+      "confidence_notes": "Context from running jobs is important because some workloads can trigger recoverable graphics engine faults."
+    },
+    {
+      "issue_id": "XID_79",
+      "description": "GPU has fallen off the bus, indicating a severe connectivity or hardware event.",
+      "severity": "P1",
+      "category": "hardware",
+      "keywords": [
+        "xid 79",
+        "fallen off the bus",
+        "pcie fault",
+        "node power cycle"
+      ],
+      "typical_resolution": "Cordon and drain the node, power cycle if needed, inspect PCIe health, and escalate to hardware support if the fault persists.",
+      "false_positive_rate": 0.02,
+      "confidence_notes": "Confidence increases when the node is partially unreachable or when multiple GPUs on the same host show degraded telemetry."
+    },
+    {
+      "issue_id": "XID_63",
+      "description": "ECC page retirement or row remapping event that is usually informational until it becomes recurrent.",
+      "severity": "P3",
+      "category": "hardware",
+      "keywords": [
+        "xid 63",
+        "page retirement",
+        "row remapping",
+        "retired pages"
+      ],
+      "typical_resolution": "Monitor the node, track recurrence, and escalate if page retirement frequency or retired-page counts trend upward.",
+      "false_positive_rate": 0.7,
+      "confidence_notes": "Single events are often benign, but recurrence over a short window can indicate degradation."
+    },
+    {
+      "issue_id": "GPU_UTIL_DROP",
+      "description": "GPU utilization dropped sharply, which can be either a workload issue or normal job behavior.",
+      "severity": "P2",
+      "category": "workload",
+      "keywords": [
+        "gpu utilization drop",
+        "low gpu usage",
+        "training stall",
+        "data preprocessing"
+      ],
+      "typical_resolution": "Inspect the active jobs and verify whether the workload is expected to be CPU-bound or waiting on input stages before taking infrastructure action.",
+      "false_positive_rate": 0.2,
+      "confidence_notes": "Running-job context is required because preprocessing and checkpoint phases can produce normal low-utilization windows."
+    },
+    {
+      "issue_id": "GPU_TEMP_HIGH",
+      "description": "GPU temperature exceeded operational thresholds.",
+      "severity": "P2",
+      "category": "hardware",
+      "keywords": [
+        "high gpu temperature",
+        "thermal event",
+        "overheat",
+        "fan issue"
+      ],
+      "typical_resolution": "Check cooling, airflow, and fan health, and consider workload throttling if temperatures exceed safe limits.",
+      "false_positive_rate": 0.15,
+      "confidence_notes": "Thermal confidence is higher when repeated thermal violations align with ambient or fan anomalies."
+    },
+    {
+      "issue_id": "OOM_KILL",
+      "description": "Container or process was terminated by the out-of-memory killer.",
+      "severity": "P3",
+      "category": "workload",
+      "keywords": [
+        "oom kill",
+        "out of memory",
+        "memory pressure",
+        "container killed"
+      ],
+      "typical_resolution": "Recommend reducing batch size or increasing requested memory and document the user pattern for future triage.",
+      "false_positive_rate": 0.0,
+      "confidence_notes": "OOM kill is generally attributable to workload sizing rather than node failure when host telemetry is healthy."
+    },
+    {
+      "issue_id": "NCCL_TIMEOUT",
+      "description": "Distributed training timed out during collective communication.",
+      "severity": "P2",
+      "category": "network",
+      "keywords": [
+        "nccl timeout",
+        "all-reduce timeout",
+        "distributed training hang",
+        "nvlink"
+      ],
+      "typical_resolution": "Check interconnect health, NCCL logs, and GPU status across participants before deciding whether the issue is workload or infrastructure driven.",
+      "false_positive_rate": 0.1,
+      "confidence_notes": "Systemic suspicion is warranted if several nodes or jobs report similar communication failures within a short interval."
+    },
+    {
+      "issue_id": "CRITICAL_SERVICE_FAILURE",
+      "description": "One or more node-critical services such as exporters or health agents have failed.",
+      "severity": "P2",
+      "category": "software",
+      "keywords": [
+        "critical services failed",
+        "restart failed critical services",
+        "nvlink-exporter.service",
+        "nvml-exporter.service",
+        "service failure"
+      ],
+      "typical_resolution": "Restart the failed service, verify it stays active, and escalate only if the service repeatedly fails or masks a deeper node issue.",
+      "false_positive_rate": 0.12,
+      "confidence_notes": "Confidence increases when the alert is limited to one or more systemd services and node telemetry is otherwise healthy."
+    },
+    {
+      "issue_id": "PCIE_BUS_INACCESSIBLE",
+      "description": "A PCIe bus path to the GPU subsystem is inaccessible.",
+      "severity": "P1",
+      "category": "hardware",
+      "keywords": [
+        "pcie bus inaccessible",
+        "tag and terminate",
+        "pcie inaccessible",
+        "bus inaccessible"
+      ],
+      "typical_resolution": "Quarantine the node, terminate or drain workloads according to policy, and escalate to hardware operations for deeper inspection.",
+      "false_positive_rate": 0.03,
+      "confidence_notes": "This alert is highly correlated with a severe host or device path failure, especially when it fires repeatedly."
+    },
+    {
+      "issue_id": "PCIE_LINK_WIDTH_AND_SPEED_MISMATCH",
+      "description": "PCIe link width or speed does not match the expected negotiated state.",
+      "severity": "P2",
+      "category": "hardware",
+      "keywords": [
+        "pcie link width and current speed mismatch",
+        "pcie mismatch",
+        "link width mismatch",
+        "current speed mismatch"
+      ],
+      "typical_resolution": "Treat as a hardware degradation signal, correlate with related PCIe alerts, and schedule maintenance or terminate the node if combined with accessibility failures.",
+      "false_positive_rate": 0.08,
+      "confidence_notes": "Confidence rises when the mismatch co-occurs with bus accessibility failures or repeated fire counts."
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "templates": [
+    {
+      "action_type": "DRAIN_AND_DIAGNOSE",
+      "action": "DRAIN AND DIAGNOSE",
+      "disruptive": true,
+      "steps": [
+        "Cordon the node to prevent new scheduling.",
+        "Wait for checkpoint-safe jobs to reach a safe pause point when available.",
+        "Drain or reschedule the impacted jobs to alternate capacity.",
+        "Run DCGM diagnostics and capture support bundles.",
+        "Escalate to hardware operations if diagnostics fail or the alert recurs."
+      ],
+      "estimated_resolution": "2-4 hours for diagnostics; 24-48 hours if replacement is required.",
+      "rollback_plan": "Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.",
+      "approval_guidance": "Requires human approval during peak hours or when the blast radius exceeds policy thresholds."
+    },
+    {
+      "action_type": "MONITOR_AND_REVIEW",
+      "action": "MONITOR AND REVIEW",
+      "disruptive": false,
+      "steps": [
+        "Leave the node in service.",
+        "Capture telemetry and note recurrence counters.",
+        "Review workload logs for application-level explanations.",
+        "Escalate only if additional evidence raises severity."
+      ],
+      "estimated_resolution": "30-60 minutes for operator review.",
+      "rollback_plan": "No rollback needed because the node remains in service; revert only any temporary alert suppression or notification routing changes.",
+      "approval_guidance": "Can be auto-approved when confidence is low but the risk to workloads is minimal."
+    },
+    {
+      "action_type": "SCHEDULE_MAINTENANCE",
+      "action": "SCHEDULE MAINTENANCE WINDOW DRAIN",
+      "disruptive": true,
+      "steps": [
+        "Cordon the node if jobs are already failing; otherwise leave it schedulable until the approved maintenance window.",
+        "Notify affected users and the on-call operations channel.",
+        "Drain the node during the next maintenance window.",
+        "Run diagnostics and hardware inspection before returning the node to service."
+      ],
+      "estimated_resolution": "Next maintenance window plus 2-4 hours of diagnostics.",
+      "rollback_plan": "If diagnostics pass and urgency is downgraded, uncordon the node and resume normal scheduling under heightened monitoring.",
+      "approval_guidance": "Use when there is a hardware hypothesis but safety policy blocks immediate drain."
+    },
+    {
+      "action_type": "MANUAL_INVESTIGATION",
+      "action": "ESCALATE FOR MANUAL INVESTIGATION",
+      "disruptive": false,
+      "steps": [
+        "Page the human operator or incident commander.",
+        "Preserve logs, telemetry snapshots, and job metadata.",
+        "Hold off on disruptive node actions until a human reviews the evidence."
+      ],
+      "estimated_resolution": "Depends on operator response and the scope of the incident.",
+      "rollback_plan": "No rollback is required because the action is investigative; document any temporary mitigations and revert them after review.",
+      "approval_guidance": "Mandatory when diagnosis confidence is below the policy threshold or when automated action would exceed a safety gate."
+    },
+    {
+      "action_type": "RESTART_PROCESS",
+      "action": "RESTART FAILED CRITICAL SERVICE",
+      "disruptive": false,
+      "steps": [
+        "Confirm the failed unit name from the alert metadata.",
+        "Restart the failed systemd unit on the affected node.",
+        "Verify the unit returns to an active state and exporter metrics resume.",
+        "Monitor for repeat failures before returning the incident to closed status."
+      ],
+      "estimated_resolution": "10-20 minutes for service recovery and observation.",
+      "rollback_plan": "Stop the restarted unit and restore the previous service configuration or package version if the restart introduces instability.",
+      "approval_guidance": "Usually auto-approved because the action is localized and non-disruptive."
+    },
+    {
+      "action_type": "TAG_AND_TERMINATE",
+      "action": "TAG NODE AND TERMINATE",
+      "disruptive": true,
+      "steps": [
+        "Tag the node as unhealthy to block new workload placement.",
+        "Capture support diagnostics and host telemetry.",
+        "Terminate or replace the node according to infrastructure policy.",
+        "Open a follow-up ticket for hardware inspection and root-cause tracking."
+      ],
+      "estimated_resolution": "30-90 minutes for node replacement plus follow-up diagnostics.",
+      "rollback_plan": "Remove the unhealthy tag and reprovision or return the node to service only if follow-up diagnostics clear the hardware suspicion.",
+      "approval_guidance": "Requires human approval during peak hours or when the blast radius exceeds policy thresholds."
+    }
+  ]
+}
