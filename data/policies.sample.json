@@ -1,0 +1,37 @@
+{
+  "severity_gate": {
+    "diagnosis_required_for": [
+      "P1",
+      "P2"
+    ],
+    "auto_resolve_for": [
+      "P3",
+      "P4"
+    ]
+  },
+  "blast_radius": {
+    "human_approval_job_threshold": 10
+  },
+  "peak_hours": {
+    "timezone": "America/New_York",
+    "business_days": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "start_hour": 9,
+    "end_hour": 18,
+    "drain_requires_human_approval": true
+  },
+  "rate_limit": {
+    "action_type": "DRAIN_NODE",
+    "max_actions": 2,
+    "window_minutes": 60
+  },
+  "confidence_threshold": 0.6,
+  "maintenance_window_defaults": {
+    "window_duration_hours": 4
+  }
+}

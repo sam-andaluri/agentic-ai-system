@@ -1,0 +1,40 @@
+{
+  "prompts": [
+    {
+      "prompt_id": "xid_48_hardware_failure",
+      "name": "Clear XID 48 hardware failure",
+      "prompt_text": "ALERT: XID 48 Double-bit ECC error on GPU memory | Host: gpu-node-042 | Starts: 2026-04-19T14:23:00Z | Fire Count: 1 | Description: Drain node and run diagnostics. | Cluster: cluster-demo-a | OCI name: inst-demo-042 | Serial: SERIAL-DEMO-042 | Panel URL: N/A | Silence URL: https://example.invalid/silence/xid48",
+      "expected_behavior": "Escalate as P1 hardware, diagnose GPU memory failure, and recommend drain with rollback."
+    },
+    {
+      "prompt_id": "gpu_utilization_false_positive",
+      "name": "GPU utilization drop that should not trigger drain",
+      "prompt_text": "ALERT: GPU utilization drop | Host: gpu-node-017 | Starts: 2026-04-19T16:05:00Z | Fire Count: 1 | Description: Sudden drop from 92 percent to 6 percent. | Cluster: cluster-demo-a | OCI name: inst-demo-017 | Serial: SERIAL-DEMO-017 | Panel URL: N/A | Silence URL: https://example.invalid/silence/util-drop",
+      "expected_behavior": "Treat as workload-related and avoid disruptive remediation."
+    },
+    {
+      "prompt_id": "recurring_xid_63_pattern",
+      "name": "Recurring XID 63 pattern",
+      "prompt_text": "ALERT: XID 63 ECC page retirement event | Host: gpu-node-088 | Starts: 2026-04-19T11:41:00Z | Fire Count: 4 | Description: Recurrent row remapping pattern observed. | Cluster: cluster-demo-b | OCI name: inst-demo-088 | Serial: SERIAL-DEMO-088 | Panel URL: N/A | Silence URL: https://example.invalid/silence/xid63",
+      "expected_behavior": "Use memory to escalate a normally benign issue and recommend cautious follow-up."
+    },
+    {
+      "prompt_id": "xid_79_peak_hours_safeguard",
+      "name": "XID 79 during peak hours with high blast radius",
+      "prompt_text": "ALERT: XID 79 GPU has fallen off the bus | Host: gpu-node-005 | Starts: 2026-04-21T18:00:00Z | Fire Count: 1 | Description: Severe connectivity failure; drain may impact active users. | Cluster: cluster-demo-c | OCI name: inst-demo-005 | Serial: SERIAL-DEMO-005 | Panel URL: N/A | Silence URL: https://example.invalid/silence/xid79",
+      "expected_behavior": "Diagnose a severe hardware issue but require human approval because of peak hours and blast radius."
+    },
+    {
+      "prompt_id": "critical_service_restart",
+      "name": "Localized critical service failure",
+      "prompt_text": "ALERT: One or more critical services failed on compute nodes. | Host: gpu-host-demo-001 | Service: nvml-exporter.service | Starts: 2026-04-21T11:10:00Z | Fire Count: 3 | Description: Check and restart failed critical services on compute node. | Cluster: cluster-demo-d | OCI name: inst-demo-svc-001 | Serial: SERIAL-DEMO-SVC-001 | Panel URL: N/A | Silence URL: https://example.invalid/silence/service",
+      "expected_behavior": "Recommend RESTART_PROCESS because telemetry is otherwise healthy."
+    },
+    {
+      "prompt_id": "pcie_bus_inaccessible",
+      "name": "PCIe bus inaccessible hardware quarantine",
+      "prompt_text": "ALERT: PCIE Bus Inaccessible | Host: gpu-host-demo-002 | Starts: 2026-04-17T03:41:00Z | Fire Count: 14 | Description: Tag and Terminate. | Cluster: cluster-demo-e | OCI name: inst-demo-pcie-002 | Serial: SERIAL-DEMO-PCIE-002 | Panel URL: N/A | Silence URL: https://example.invalid/silence/pcie",
+      "expected_behavior": "Treat as critical hardware failure and recommend node quarantine or termination."
+    }
+  ]
+}

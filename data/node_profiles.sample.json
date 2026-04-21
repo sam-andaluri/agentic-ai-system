@@ -1,0 +1,602 @@
+{
+  "default_profile": {
+    "summary": "Fallback profile for unrecognized hosts. The node appears mostly healthy, so the workflow should lean toward manual investigation unless the alert itself is strongly diagnostic.",
+    "tool_context": {
+      "alert_history": [],
+      "node_status": {
+        "gpu_count": 8,
+        "gpu_utilization": [45, 43, 46, 44, 42, 47, 45, 44],
+        "temperature_celsius": [67, 67, 68, 67, 66, 68, 67, 67],
+        "ecc_errors_total": 0,
+        "memory_used_pct": 56,
+        "running_job_count": 2,
+        "uptime_hours": 120
+      },
+      "gpu_error_details": {
+        "xid_errors": [],
+        "ecc_sbe_count": 0,
+        "ecc_dbe_count": 0,
+        "retired_pages_count": 0,
+        "thermal_violations": 0
+      },
+      "running_jobs": [
+        {
+          "job_id": "job-default-001",
+          "user": "team-default-a",
+          "gpu_count": 2,
+          "runtime_hours": 3.5,
+          "framework": "pytorch",
+          "job_type": "training",
+          "status_summary": "Healthy workload with no known infrastructure complaints."
+        },
+        {
+          "job_id": "job-default-002",
+          "user": "team-default-b",
+          "gpu_count": 2,
+          "runtime_hours": 1.8,
+          "framework": "tensorflow",
+          "job_type": "inference",
+          "status_summary": "Latency and telemetry both look normal."
+        }
+      ],
+      "blast_radius": {
+        "affected_job_count": 2,
+        "affected_user_count": 2,
+        "estimated_reschedule_time": "10-15 minutes",
+        "alternative_nodes_available": 4
+      },
+      "maintenance_window": {
+        "in_window": false,
+        "next_window_start": "2026-04-21T23:00:00Z",
+        "next_window_hours": 4
+      }
+    },
+    "cross_incident_memory": {
+      "node_patterns": [
+        "No established node-specific memory exists for this host."
+      ],
+      "user_patterns": [],
+      "recent_actions": []
+    }
+  },
+  "profiles": [
+    {
+      "host": "gpu-node-042",
+      "summary": "Clear hardware failure profile with a first-occurrence double-bit ECC event and otherwise normal thermals.",
+      "tool_context": {
+        "alert_history": [],
+        "node_status": {
+          "gpu_count": 8,
+          "gpu_utilization": [74, 76, 71, 73, 69, 75, 72, 70],
+          "temperature_celsius": [71, 72, 72, 72, 70, 71, 73, 71],
+          "ecc_errors_total": 1,
+          "memory_used_pct": 82,
+          "running_job_count": 2,
+          "uptime_hours": 188
+        },
+        "gpu_error_details": {
+          "xid_errors": [
+            {
+              "code": "XID_48",
+              "timestamp": "2026-04-19T14:22:54Z"
+            }
+          ],
+          "ecc_sbe_count": 0,
+          "ecc_dbe_count": 1,
+          "retired_pages_count": 0,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-9001",
+            "user": "research-a",
+            "gpu_count": 4,
+            "runtime_hours": 11.2,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Checkpointing every 15 minutes."
+          },
+          {
+            "job_id": "job-9002",
+            "user": "research-a",
+            "gpu_count": 4,
+            "runtime_hours": 5.4,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Healthy but running on the affected node."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 2,
+          "affected_user_count": 1,
+          "estimated_reschedule_time": "15-20 minutes",
+          "alternative_nodes_available": 5
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-19T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "No material alert history for gpu-node-042 in the last 7 days."
+        ],
+        "user_patterns": [],
+        "recent_actions": []
+      }
+    },
+    {
+      "host": "gpu-node-017",
+      "summary": "False-positive style workload profile where preprocessing stages leave GPUs temporarily idle without any hardware fault.",
+      "tool_context": {
+        "alert_history": [],
+        "node_status": {
+          "gpu_count": 4,
+          "gpu_utilization": [7, 9, 6, 8],
+          "temperature_celsius": [61, 62, 60, 61],
+          "ecc_errors_total": 0,
+          "memory_used_pct": 33,
+          "running_job_count": 1,
+          "uptime_hours": 96
+        },
+        "gpu_error_details": {
+          "xid_errors": [],
+          "ecc_sbe_count": 0,
+          "ecc_dbe_count": 0,
+          "retired_pages_count": 0,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-8110",
+            "user": "data-eng-2",
+            "gpu_count": 4,
+            "runtime_hours": 2.1,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Job notes indicate CPU-heavy shard preprocessing between training epochs."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 1,
+          "affected_user_count": 1,
+          "estimated_reschedule_time": "10 minutes",
+          "alternative_nodes_available": 6
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-19T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "No prior GPU hardware alerts on gpu-node-017."
+        ],
+        "user_patterns": [
+          "User data-eng-2 routinely runs preprocessing stages that temporarily idle GPUs."
+        ],
+        "recent_actions": []
+      }
+    },
+    {
+      "host": "gpu-node-088",
+      "summary": "Recurring XID 63 profile where repetition matters more than any single alert instance.",
+      "tool_context": {
+        "alert_history": [
+          {
+            "timestamp": "2026-04-14T08:31:00Z",
+            "alert_type": "XID_63",
+            "severity": "P3",
+            "resolution": "Auto-resolved after monitoring."
+          },
+          {
+            "timestamp": "2026-04-16T19:12:00Z",
+            "alert_type": "XID_63",
+            "severity": "P3",
+            "resolution": "Auto-resolved after monitoring."
+          },
+          {
+            "timestamp": "2026-04-18T03:10:00Z",
+            "alert_type": "XID_63",
+            "severity": "P3",
+            "resolution": "Auto-resolved after monitoring."
+          }
+        ],
+        "node_status": {
+          "gpu_count": 8,
+          "gpu_utilization": [66, 63, 61, 64, 62, 60, 65, 63],
+          "temperature_celsius": [68, 68, 69, 68, 67, 69, 68, 68],
+          "ecc_errors_total": 4,
+          "memory_used_pct": 76,
+          "running_job_count": 3,
+          "uptime_hours": 312
+        },
+        "gpu_error_details": {
+          "xid_errors": [
+            {
+              "code": "XID_63",
+              "timestamp": "2026-04-19T11:40:47Z"
+            }
+          ],
+          "ecc_sbe_count": 12,
+          "ecc_dbe_count": 0,
+          "retired_pages_count": 16,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-7221",
+            "user": "vision-lab",
+            "gpu_count": 2,
+            "runtime_hours": 18.3,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Long-running distributed image model."
+          },
+          {
+            "job_id": "job-7222",
+            "user": "vision-lab",
+            "gpu_count": 4,
+            "runtime_hours": 9.7,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Checkpoint-safe training job."
+          },
+          {
+            "job_id": "job-7223",
+            "user": "vision-lab",
+            "gpu_count": 2,
+            "runtime_hours": 4.5,
+            "framework": "pytorch",
+            "job_type": "inference",
+            "status_summary": "Serving load remains healthy."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 3,
+          "affected_user_count": 1,
+          "estimated_reschedule_time": "20-25 minutes",
+          "alternative_nodes_available": 4
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-19T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "gpu-node-088 recorded 3 prior XID 63 alerts in the last week."
+        ],
+        "user_patterns": [],
+        "recent_actions": []
+      }
+    },
+    {
+      "host": "gpu-node-005",
+      "summary": "High-impact XID 79 hardware failure during business hours on a heavily used node.",
+      "tool_context": {
+        "alert_history": [],
+        "node_status": {
+          "gpu_count": 8,
+          "gpu_utilization": [88, 84, 86, 82, 90, 87, 85, 89],
+          "temperature_celsius": [72, 71, 73, 71, 74, 72, 71, 73],
+          "ecc_errors_total": 0,
+          "memory_used_pct": 91,
+          "running_job_count": 11,
+          "uptime_hours": 144
+        },
+        "gpu_error_details": {
+          "xid_errors": [
+            {
+              "code": "XID_79",
+              "timestamp": "2026-04-21T17:59:56Z"
+            }
+          ],
+          "ecc_sbe_count": 0,
+          "ecc_dbe_count": 0,
+          "retired_pages_count": 0,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-5001",
+            "user": "team-a",
+            "gpu_count": 1,
+            "runtime_hours": 4.2,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Node instability detected."
+          },
+          {
+            "job_id": "job-5002",
+            "user": "team-b",
+            "gpu_count": 1,
+            "runtime_hours": 9.5,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Checkpoint available."
+          },
+          {
+            "job_id": "job-5003",
+            "user": "team-c",
+            "gpu_count": 2,
+            "runtime_hours": 7.4,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "High priority workload."
+          },
+          {
+            "job_id": "job-5004",
+            "user": "team-d",
+            "gpu_count": 1,
+            "runtime_hours": 2.3,
+            "framework": "pytorch",
+            "job_type": "inference",
+            "status_summary": "Latency may be impacted."
+          },
+          {
+            "job_id": "job-5005",
+            "user": "team-e",
+            "gpu_count": 1,
+            "runtime_hours": 5.1,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Checkpoint available."
+          },
+          {
+            "job_id": "job-5006",
+            "user": "team-f",
+            "gpu_count": 1,
+            "runtime_hours": 6.8,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Active on the affected node."
+          },
+          {
+            "job_id": "job-5007",
+            "user": "team-g",
+            "gpu_count": 1,
+            "runtime_hours": 3.4,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Checkpoint available."
+          },
+          {
+            "job_id": "job-5008",
+            "user": "team-h",
+            "gpu_count": 1,
+            "runtime_hours": 8.0,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Dependent on peer traffic."
+          },
+          {
+            "job_id": "job-5009",
+            "user": "team-i",
+            "gpu_count": 1,
+            "runtime_hours": 1.9,
+            "framework": "pytorch",
+            "job_type": "inference",
+            "status_summary": "Serving traffic on the node."
+          },
+          {
+            "job_id": "job-5010",
+            "user": "team-j",
+            "gpu_count": 1,
+            "runtime_hours": 12.4,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Long-running job with checkpoints."
+          },
+          {
+            "job_id": "job-5011",
+            "user": "team-k",
+            "gpu_count": 1,
+            "runtime_hours": 2.6,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Recently started job."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 11,
+          "affected_user_count": 11,
+          "estimated_reschedule_time": "45-60 minutes",
+          "alternative_nodes_available": 1
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-21T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "gpu-node-005 has no prior XID 79 history, suggesting a fresh severe hardware event."
+        ],
+        "user_patterns": [],
+        "recent_actions": []
+      }
+    },
+    {
+      "host": "gpu-host-demo-001",
+      "summary": "Localized exporter failure where workload telemetry remains healthy and node-level GPU health is normal.",
+      "tool_context": {
+        "alert_history": [
+          {
+            "timestamp": "2026-04-15T21:20:00Z",
+            "alert_type": "CRITICAL_SERVICE_FAILURE",
+            "severity": "P3",
+            "resolution": "Single exporter restart cleared the issue."
+          }
+        ],
+        "node_status": {
+          "gpu_count": 8,
+          "gpu_utilization": [38, 36, 40, 39, 37, 41, 38, 40],
+          "temperature_celsius": [64, 64, 65, 64, 63, 65, 64, 64],
+          "ecc_errors_total": 0,
+          "memory_used_pct": 52,
+          "running_job_count": 2,
+          "uptime_hours": 89
+        },
+        "gpu_error_details": {
+          "xid_errors": [],
+          "ecc_sbe_count": 0,
+          "ecc_dbe_count": 0,
+          "retired_pages_count": 0,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-svc-001",
+            "user": "team-redacted-a",
+            "gpu_count": 2,
+            "runtime_hours": 3.1,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Exporter metrics missing but workload remains healthy."
+          },
+          {
+            "job_id": "job-svc-002",
+            "user": "team-redacted-b",
+            "gpu_count": 2,
+            "runtime_hours": 1.7,
+            "framework": "pytorch",
+            "job_type": "inference",
+            "status_summary": "No application-level failures observed."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 2,
+          "affected_user_count": 2,
+          "estimated_reschedule_time": "10-15 minutes",
+          "alternative_nodes_available": 5
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-21T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "gpu-host-demo-001 occasionally loses exporter services but has no recent hardware faults."
+        ],
+        "user_patterns": [],
+        "recent_actions": []
+      }
+    },
+    {
+      "host": "gpu-host-demo-002",
+      "summary": "Severe PCIe accessibility failure that should lead to hardware quarantine or termination.",
+      "tool_context": {
+        "alert_history": [
+          {
+            "timestamp": "2026-04-16T02:11:00Z",
+            "alert_type": "PCIE_LINK_WIDTH_AND_SPEED_MISMATCH",
+            "severity": "P2",
+            "resolution": "Escalated to hardware triage."
+          }
+        ],
+        "node_status": {
+          "gpu_count": 8,
+          "gpu_utilization": [88, 0, 86, 84, 90, 87, 85, 89],
+          "temperature_celsius": [72, 54, 73, 71, 74, 72, 71, 73],
+          "ecc_errors_total": 0,
+          "memory_used_pct": 90,
+          "running_job_count": 6,
+          "uptime_hours": 144
+        },
+        "gpu_error_details": {
+          "xid_errors": [
+            {
+              "code": "PCIE_BUS_INACCESSIBLE",
+              "timestamp": "2026-04-17T03:41:00Z"
+            }
+          ],
+          "ecc_sbe_count": 0,
+          "ecc_dbe_count": 0,
+          "retired_pages_count": 0,
+          "thermal_violations": 0
+        },
+        "running_jobs": [
+          {
+            "job_id": "job-pcie-001",
+            "user": "team-c",
+            "gpu_count": 1,
+            "runtime_hours": 4.2,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Node instability detected."
+          },
+          {
+            "job_id": "job-pcie-002",
+            "user": "team-d",
+            "gpu_count": 1,
+            "runtime_hours": 9.5,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Checkpoint available."
+          },
+          {
+            "job_id": "job-pcie-003",
+            "user": "team-e",
+            "gpu_count": 2,
+            "runtime_hours": 7.4,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "High priority workload."
+          },
+          {
+            "job_id": "job-pcie-004",
+            "user": "team-f",
+            "gpu_count": 1,
+            "runtime_hours": 2.3,
+            "framework": "pytorch",
+            "job_type": "inference",
+            "status_summary": "Latency may be impacted."
+          },
+          {
+            "job_id": "job-pcie-005",
+            "user": "team-c",
+            "gpu_count": 2,
+            "runtime_hours": 8.0,
+            "framework": "pytorch",
+            "job_type": "training",
+            "status_summary": "Dependent on peer traffic."
+          },
+          {
+            "job_id": "job-pcie-006",
+            "user": "team-d",
+            "gpu_count": 1,
+            "runtime_hours": 5.6,
+            "framework": "tensorflow",
+            "job_type": "training",
+            "status_summary": "Active on the affected node."
+          }
+        ],
+        "blast_radius": {
+          "affected_job_count": 6,
+          "affected_user_count": 4,
+          "estimated_reschedule_time": "45-60 minutes",
+          "alternative_nodes_available": 1
+        },
+        "maintenance_window": {
+          "in_window": false,
+          "next_window_start": "2026-04-17T23:00:00Z",
+          "next_window_hours": 4
+        }
+      },
+      "cross_incident_memory": {
+        "node_patterns": [
+          "gpu-host-demo-002 fired a PCIe mismatch alert one day before the bus became inaccessible."
+        ],
+        "user_patterns": [],
+        "recent_actions": []
+      }
+    }
+  ]
+}
