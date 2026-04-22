@@ -1,0 +1,55 @@
+═══════════════════════════════════════════════════════════
+INCIDENT REPORT: ALT-20260419142300-GPU_NODE_042
+Node: gpu-node-042 | Alert: XID_48_DOUBLE_BIT_ECC_ERROR_ON_GPU_MEMORY | Time: 2026-04-19 14:23 UTC
+═══════════════════════════════════════════════════════════
+
+TRIAGE (Agent 1)
+  Severity: P2
+  Category: Hardware
+  Escalate: Yes -> Diagnosis Agent
+  Tools Used: lookup_alert_history, check_node_status
+  Reasoning: "The incident is classified as a P2 severity due to the XID 48 Double-bit ECC error on GPU memory, which indicates a significant hardware issue. There is no recent alert history for this node, suggesting that this is a new issue rather than a recurring one. The node status shows a healthy GPU utilization and temperature, but the presence of an ECC error indicates a potential hardware failure that requires further diagnostics."
+  Source Alert:
+    ALERT: XID 48 Double-bit ECC error on GPU memory | Host: gpu-node-042 | Starts: 2026-04-19T14:23:00Z | Fire Count: 1 | Description: Drain node and run diagnostics. | Cluster: cluster-demo-a | OCI name: inst-demo-042 | Serial: SERIAL-DEMO-042 | Panel URL: N/A | Silence URL: https://example.invalid/silence/xid48
+
+DIAGNOSIS (Agent 2)
+  Root Cause: Double-bit ECC error in GPU memory indicating potential hardware failure. (confidence: 0.95)
+  Tools Used: get_gpu_error_details, get_running_jobs, search_knowledge_base
+  Evidence:
+    - XID 48 Double-bit ECC error reported on gpu-node-042.
+    - One double-bit ECC error detected with no single-bit errors.
+    - Currently running jobs on the node are training jobs that may stress the GPU memory.
+  Knowledge Base Match:
+    - XID_48
+
+REMEDIATION (Agent 3)
+  Recommended Action: DRAIN AND DIAGNOSE
+  Tools Used: draft_remediation_plan, check_blast_radius, check_maintenance_window
+  Steps:
+    1. Cordon the node to prevent new scheduling.
+    2. Wait for checkpoint-safe jobs to reach a safe pause point when available.
+    3. Drain or reschedule the impacted jobs to alternate capacity.
+    4. Run DCGM diagnostics and capture support bundles.
+    5. Escalate to hardware operations if diagnostics fail or the alert recurs.
+  Blast Radius: 2 jobs, 1 users affected
+  Approval: HUMAN-REQUIRED
+  Rollback: Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.
+  Estimated Resolution: 2-4 hours for diagnostics; 24-48 hours if replacement is required.
+
+AUDIT TRAIL
+  [2026-04-22 15:50:35 EDT] Alert received: XID_48_DOUBLE_BIT_ECC_ERROR_ON_GPU_MEMORY on gpu-node-042
+  [2026-04-22 15:50:37 EDT] Orchestrator Agent: Initiating triage for alert ALT-20260419142300-GPU_NODE_042 due to absence of triage results.
+  [2026-04-22 15:50:39 EDT] Triage Agent: tool lookup_alert_history invoked with input={"node_id": "gpu-node-042"} output=[]
+  [2026-04-22 15:50:39 EDT] Triage Agent: tool check_node_status invoked with input={"node_id": "gpu-node-042"} output={"ecc_errors_total": 1, "gpu_count": 8, "gpu_utilization": [74.0, 76.0, 71.0, 73.0, 69.0, 75.0, 72.0, 70.0], "memory_used_pct": 82.0, "running_job_count": 2, "temperature_celsius": [71.0, 72.0, 72.0, 72.0, 70.0, 71.0, 73.0, 71.0], "uptime_hours": 188.0}
+  [2026-04-22 15:50:45 EDT] Triage Agent: classified severity=P2 category=hardware escalating=True
+  [2026-04-22 15:50:47 EDT] Orchestrator Agent: Routing to diagnosis after completing triage for alert ALT-20260419142300-GPU_NODE_042.
+  [2026-04-22 15:50:49 EDT] Diagnosis Agent: tool get_gpu_error_details invoked with input={"node_id": "gpu-node-042"} output={"ecc_dbe_count": 1, "ecc_sbe_count": 0, "retired_pages_count": 0, "thermal_violations": 0, "xid_errors": [{"code": "XID_48", "timestamp": "2026-04-19T14:22:54Z"}]}
+  [2026-04-22 15:50:49 EDT] Diagnosis Agent: tool get_running_jobs invoked with input={"node_id": "gpu-node-042"} output=[{"framework": "pytorch", "gpu_count": 4, "job_id": "job-9001", "job_type": "training", "runtime_hours": 11.2, "status_summary": "Checkpointing every 15 minutes.", "user": "research-a"}, {"framework": "pytorch", "gpu_count": 4, "job_id": "job-9002", "job_type": "training", "runtime_hours": 5.4, "status_summary": "Healthy but running on the affected node.", "user": "research-a"}]
+  [2026-04-22 15:50:49 EDT] Diagnosis Agent: tool search_knowledge_base invoked with input={"query": "XID_48_DOUBLE_BIT_ECC_ERROR_ON_GPU_MEMORY"} output=[{"category": "hardware", "confidence_notes": "A DBE is strongly correlated with hardware failure when temperatures are otherwise normal.", "description": "Double-bit ECC error in GPU memory.", "false_positive_rate": 0.05, "issue_id": "XID_48", "keywords": ["xid 48", "double-bit ecc", "memory corruption", "uncorrectable ecc"], "severity": "P1", "typical_resolution": "Drain the node, run DCGM diagnostics, and replace the affected GPU if diagnostics fail or the error recurs."}]
+  [2026-04-22 15:50:55 EDT] Diagnosis Agent: root cause=Double-bit ECC error in GPU memory indicating potential hardware failure. confidence=0.95
+  [2026-04-22 15:50:56 EDT] Orchestrator Agent: Routing to remediation after completing diagnosis for alert ALT-20260419142300-GPU_NODE_042.
+  [2026-04-22 15:50:58 EDT] Remediation Agent: tool draft_remediation_plan invoked with input={"action_type": "DRAIN_AND_DIAGNOSE", "node_id": "gpu-node-042"} output={"action": "DRAIN AND DIAGNOSE", "action_type": "DRAIN_AND_DIAGNOSE", "approval_guidance": "Requires human approval during peak hours or when the blast radius exceeds policy thresholds.", "disruptive": true, "estimated_resolution": "2-4 hours for diagnostics; 24-48 hours if replacement is required.", "rollback_plan": "Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.", "steps": ["Cordon the node to prevent new scheduling.", "Wait for checkpoint-safe jobs to reach a safe pause point when available.", "Drain or reschedule the impacted jobs to alternate capacity.", "Run DCGM diagnostics and capture support bundles.", "Escalate to hardware operations if diagnostics fail or the alert recurs."]}
+  [2026-04-22 15:50:58 EDT] Remediation Agent: tool check_blast_radius invoked with input={"node_id": "gpu-node-042"} output={"affected_job_count": 2, "affected_user_count": 1, "alternative_nodes_available": 5, "estimated_reschedule_time": "15-20 minutes"}
+  [2026-04-22 15:50:58 EDT] Remediation Agent: tool check_maintenance_window invoked with input={} output={"in_window": false, "next_window_hours": 4.0, "next_window_start": "2026-04-19T23:00:00Z"}
+  [2026-04-22 15:51:04 EDT] Remediation Agent: recommended DRAIN AND DIAGNOSE with approval=HUMAN-REQUIRED
+  [2026-04-22 15:51:05 EDT] Orchestrator Agent: Routing to finalize as remediation requires human approval for alert ALT-20260419142300-GPU_NODE_042.

@@ -1,0 +1,59 @@
+═══════════════════════════════════════════════════════════
+INCIDENT REPORT: ALT-20260421180000-GPU_NODE_005
+Node: gpu-node-005 | Alert: XID_79_GPU_HAS_FALLEN_OFF_THE_BUS | Time: 2026-04-21 18:00 UTC
+═══════════════════════════════════════════════════════════
+
+TRIAGE (Agent 1)
+  Severity: P2
+  Category: Hardware
+  Escalate: Yes -> Diagnosis Agent
+  Tools Used: lookup_alert_history, check_node_status
+  Reasoning: "The incident involves a severe connectivity failure (XID 79) with no prior history on this node, indicating a fresh hardware issue. The node is currently under high utilization and is in peak hours, which increases the impact on active users."
+  Source Alert:
+    ALERT: XID 79 GPU has fallen off the bus | Host: gpu-node-005 | Starts: 2026-04-21T18:00:00Z | Fire Count: 1 | Description: Severe connectivity failure; drain may impact active users. | Cluster: cluster-demo-c | OCI name: inst-demo-005 | Serial: SERIAL-DEMO-005 | Panel URL: N/A | Silence URL: https://example.invalid/silence/xid79
+
+DIAGNOSIS (Agent 2)
+  Root Cause: Severe hardware failure indicated by XID 79, likely due to connectivity issues. (confidence: 0.85)
+  Tools Used: get_gpu_error_details, get_running_jobs, search_knowledge_base
+  Evidence:
+    - XID 79 error reported at 2026-04-21T17:59:56Z, indicating a severe connectivity failure.
+    - No prior history of XID 79 on gpu-node-005 suggests this is a new hardware issue.
+    - Current GPU utilization is high (average 88%), which may exacerbate the impact of the failure.
+    - Multiple active jobs on the node, including high-priority workloads, may be affected.
+  Knowledge Base Match:
+    - XID_79
+
+REMEDIATION (Agent 3)
+  Recommended Action: SCHEDULE MAINTENANCE WINDOW DRAIN
+  Tools Used: draft_remediation_plan, check_blast_radius, check_maintenance_window
+  Steps:
+    1. Cordon the node if jobs are already failing; otherwise leave it schedulable until the approved maintenance window.
+    2. Notify affected users and the on-call operations channel.
+    3. Drain the node during the next maintenance window.
+    4. Run diagnostics and hardware inspection before returning the node to service.
+  Blast Radius: 11 jobs, 11 users affected
+  Approval: HUMAN-REQUIRED
+  Rollback: If diagnostics pass and urgency is downgraded, uncordon the node and resume normal scheduling under heightened monitoring.
+  Estimated Resolution: Next maintenance window plus 2-4 hours of diagnostics.
+  Safeguards Triggered:
+    - Peak-hours protection blocked an immediate drain and forced scheduled maintenance.
+    - Blast-radius threshold exceeded. Human approval is required.
+
+AUDIT TRAIL
+  [2026-04-22 16:52:33 EDT] Alert received: XID_79_GPU_HAS_FALLEN_OFF_THE_BUS on gpu-node-005
+  [2026-04-22 16:52:36 EDT] Orchestrator Agent: Initiating triage for alert ALT-20260421180000-GPU_NODE_005.
+  [2026-04-22 16:52:39 EDT] Triage Agent: tool lookup_alert_history invoked with input={"node_id": "gpu-node-005"} output=[]
+  [2026-04-22 16:52:39 EDT] Triage Agent: tool check_node_status invoked with input={"node_id": "gpu-node-005"} output={"ecc_errors_total": 0, "gpu_count": 8, "gpu_utilization": [88.0, 84.0, 86.0, 82.0, 90.0, 87.0, 85.0, 89.0], "memory_used_pct": 91.0, "running_job_count": 11, "temperature_celsius": [72.0, 71.0, 73.0, 71.0, 74.0, 72.0, 71.0, 73.0], "uptime_hours": 144.0}
+  [2026-04-22 16:52:45 EDT] Triage Agent: classified severity=P2 category=hardware escalating=True
+  [2026-04-22 16:52:46 EDT] Orchestrator Agent: Routing to diagnosis after completing triage for alert ALT-20260421180000-GPU_NODE_005.
+  [2026-04-22 16:52:48 EDT] Diagnosis Agent: tool get_gpu_error_details invoked with input={"node_id": "gpu-node-005"} output={"ecc_dbe_count": 0, "ecc_sbe_count": 0, "retired_pages_count": 0, "thermal_violations": 0, "xid_errors": [{"code": "XID_79", "timestamp": "2026-04-21T17:59:56Z"}]}
+  [2026-04-22 16:52:48 EDT] Diagnosis Agent: tool get_running_jobs invoked with input={"node_id": "gpu-node-005"} output=[{"framework": "pytorch", "gpu_count": 1, "job_id": "job-5001", "job_type": "training", "runtime_hours": 4.2, "status_summary": "Node instability detected.", "user": "team-a"}, {"framework": "tensorflow", "gpu_count": 1, "job_id": "job-5002", "job_type": "training", "runtime_hours": 9.5, "status_summary": "Checkpoint available.", "user": "team-b"}, {"framework": "pytorch", "gpu_count": 2, "job_id": "job-5003", "job_type": "training", "runtime_hours": 7.4, "status_summary": "High priority workload.", "user": "team-c"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5004", "job_type": "inference", "runtime_hours": 2.3, "status_summary": "Latency may be impacted.", "user": "team-d"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5005", "job_type": "training", "runtime_hours": 5.1, "status_summary": "Checkpoint available.", "user": "team-e"}, {"framework": "tensorflow", "gpu_count": 1, "job_id": "job-5006", "job_type": "training", "runtime_hours": 6.8, "status_summary": "Active on the affected node.", "user": "team-f"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5007", "job_type": "training", "runtime_hours": 3.4, "status_summary": "Checkpoint available.", "user": "team-g"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5008", "job_type": "training", "runtime_hours": 8.0, "status_summary": "Dependent on peer traffic.", "user": "team-h"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5009", "job_type": "inference", "runtime_hours": 1.9, "status_summary": "Serving traffic on the node.", "user": "team-i"}, {"framework": "tensorflow", "gpu_count": 1, "job_id": "job-5010", "job_type": "training", "runtime_hours": 12.4, "status_summary": "Long-running job with checkpoints.", "user": "team-j"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-5011", "job_type": "training", "runtime_hours": 2.6, "status_summary": "Recently started job.", "user": "team-k"}]
+  [2026-04-22 16:52:48 EDT] Diagnosis Agent: tool search_knowledge_base invoked with input={"query": "XID_79_GPU_HAS_FALLEN_OFF_THE_BUS"} output=[{"category": "hardware", "confidence_notes": "Confidence increases when the node is partially unreachable or when multiple GPUs on the same host show degraded telemetry.", "description": "GPU has fallen off the bus, indicating a severe connectivity or hardware event.", "false_positive_rate": 0.02, "issue_id": "XID_79", "keywords": ["xid 79", "fallen off the bus", "pcie fault", "node power cycle"], "severity": "P1", "typical_resolution": "Cordon and drain the node, power cycle if needed, inspect PCIe health, and escalate to hardware support if the fault persists."}]
+  [2026-04-22 16:52:59 EDT] Diagnosis Agent: root cause=Severe hardware failure indicated by XID 79, likely due to connectivity issues. confidence=0.85
+  [2026-04-22 16:53:01 EDT] Orchestrator Agent: Routing to remediation after completing diagnosis for alert ALT-20260421180000-GPU_NODE_005.
+  [2026-04-22 16:53:03 EDT] Remediation Agent: tool draft_remediation_plan invoked with input={"action_type": "DRAIN_AND_DIAGNOSE", "node_id": "gpu-node-005"} output={"action": "DRAIN AND DIAGNOSE", "action_type": "DRAIN_AND_DIAGNOSE", "approval_guidance": "Requires human approval during peak hours or when the blast radius exceeds policy thresholds.", "disruptive": true, "estimated_resolution": "2-4 hours for diagnostics; 24-48 hours if replacement is required.", "rollback_plan": "Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.", "steps": ["Cordon the node to prevent new scheduling.", "Wait for checkpoint-safe jobs to reach a safe pause point when available.", "Drain or reschedule the impacted jobs to alternate capacity.", "Run DCGM diagnostics and capture support bundles.", "Escalate to hardware operations if diagnostics fail or the alert recurs."]}
+  [2026-04-22 16:53:03 EDT] Remediation Agent: tool check_blast_radius invoked with input={"node_id": "gpu-node-005"} output={"affected_job_count": 11, "affected_user_count": 11, "alternative_nodes_available": 1, "estimated_reschedule_time": "45-60 minutes"}
+  [2026-04-22 16:53:03 EDT] Remediation Agent: tool check_maintenance_window invoked with input={} output={"in_window": false, "next_window_hours": 4.0, "next_window_start": "2026-04-21T23:00:00Z"}
+  [2026-04-22 16:53:09 EDT] Remediation Agent: ESCALATION: Human approval required because action would affect 11 jobs.
+  [2026-04-22 16:53:09 EDT] Remediation Agent: recommended SCHEDULE MAINTENANCE WINDOW DRAIN with approval=HUMAN-REQUIRED
+  [2026-04-22 16:53:11 EDT] Orchestrator Agent: Finalized incident due to required human approval for remediation actions during peak hours.
