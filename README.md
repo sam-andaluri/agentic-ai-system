@@ -189,7 +189,19 @@ If you update the report markdown, regenerate the PDF with:
 pandoc Agentic_AI_System_Design_Report.md -o Agentic_AI_System_Design_Report.pdf
 ```
 
-## 11. Generate Final `requirements.txt`
+## 11. Convert LangChain mermaid to svg
+
+To convert LangChain mermaid diagram from mmd to svg:
+
+Install mermaid-cli: https://github.com/mermaid-js/mermaid-cli
+
+The following command generates svg file in `outputs`
+
+```bash
+mmdc -i outputs/langgraph_workflow.mmd
+```
+
+## 12. Generate Final `requirements.txt`
 
 After running the notebook or script in your final environment, regenerate the exact package versions:
 
