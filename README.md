@@ -67,8 +67,8 @@ pandoc --version
 From the project folder:
 
 ```bash
-cd project-6
-uv venv .venv
+cd agentic-ai-system
+uv venv .venv --python 3.13.5
 source .venv/bin/activate
 ```
 

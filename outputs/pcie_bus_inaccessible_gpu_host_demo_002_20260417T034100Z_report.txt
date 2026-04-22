@@ -1,0 +1,56 @@
+═══════════════════════════════════════════════════════════
+INCIDENT REPORT: ALT-20260417034100-GPU_HOST_DEMO_002
+Node: gpu-host-demo-002 | Alert: PCIE_BUS_INACCESSIBLE | Time: 2026-04-17 03:41 UTC
+═══════════════════════════════════════════════════════════
+
+TRIAGE (Agent 1)
+  Severity: P2
+  Category: Hardware
+  Escalate: Yes -> Diagnosis Agent
+  Tools Used: lookup_alert_history, check_node_status
+  Reasoning: "The incident is classified as P2 severity due to a recurring issue with the PCIe bus, which follows a previous alert about a PCIe link width and speed mismatch. The node's telemetry indicates high GPU utilization and memory usage, but no critical hardware failures are reported. Given the history of alerts and the current incident, escalation is warranted for further hardware investigation."
+  Source Alert:
+    ALERT: PCIE Bus Inaccessible | Host: gpu-host-demo-002 | Starts: 2026-04-17T03:41:00Z | Fire Count: 14 | Description: Tag and Terminate. | Cluster: cluster-demo-e | OCI name: inst-demo-pcie-002 | Serial: SERIAL-DEMO-PCIE-002 | Panel URL: N/A | Silence URL: https://example.invalid/silence/pcie
+
+DIAGNOSIS (Agent 2)
+  Root Cause: Recurring PCIe bus accessibility failure likely due to previous link width and speed mismatch. (confidence: 0.85)
+  Tools Used: get_gpu_error_details, get_running_jobs, search_knowledge_base
+  Evidence:
+    - Current alert indicates 14 occurrences of PCIe bus inaccessibility.
+    - Previous alert on 2026-04-16 regarding PCIe link width and speed mismatch.
+    - No critical hardware failures reported in GPU error details.
+  Knowledge Base Match:
+    - PCIE_BUS_INACCESSIBLE
+    - PCIE_LINK_WIDTH_AND_SPEED_MISMATCH
+
+REMEDIATION (Agent 3)
+  Recommended Action: DRAIN AND DIAGNOSE
+  Tools Used: draft_remediation_plan, check_blast_radius, check_maintenance_window
+  Steps:
+    1. Cordon the node to prevent new scheduling.
+    2. Wait for checkpoint-safe jobs to reach a safe pause point when available.
+    3. Drain or reschedule the impacted jobs to alternate capacity.
+    4. Run DCGM diagnostics and capture support bundles.
+    5. Escalate to hardware operations if diagnostics fail or the alert recurs.
+  Blast Radius: 6 jobs, 4 users affected
+  Approval: HUMAN-REQUIRED
+  Rollback: Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.
+  Estimated Resolution: 2-4 hours for diagnostics; 24-48 hours if replacement is required.
+
+AUDIT TRAIL
+  [2026-04-22 15:49:34 EDT] Alert received: PCIE_BUS_INACCESSIBLE on gpu-host-demo-002
+  [2026-04-22 15:49:35 EDT] Orchestrator Agent: Initiating triage for alert ALT-20260417034100-GPU_HOST_DEMO_002.
+  [2026-04-22 15:49:37 EDT] Triage Agent: tool lookup_alert_history invoked with input={"node_id": "gpu-host-demo-002"} output=[{"alert_type": "PCIE_LINK_WIDTH_AND_SPEED_MISMATCH", "resolution": "Escalated to hardware triage.", "severity": "P2", "timestamp": "2026-04-16T02:11:00Z"}]
+  [2026-04-22 15:49:37 EDT] Triage Agent: tool check_node_status invoked with input={"node_id": "gpu-host-demo-002"} output={"ecc_errors_total": 0, "gpu_count": 8, "gpu_utilization": [88.0, 0.0, 86.0, 84.0, 90.0, 87.0, 85.0, 89.0], "memory_used_pct": 90.0, "running_job_count": 6, "temperature_celsius": [72.0, 54.0, 73.0, 71.0, 74.0, 72.0, 71.0, 73.0], "uptime_hours": 144.0}
+  [2026-04-22 15:49:42 EDT] Triage Agent: classified severity=P2 category=hardware escalating=True
+  [2026-04-22 15:49:44 EDT] Orchestrator Agent: Routing to diagnosis after completing triage for alert ALT-20260417034100-GPU_HOST_DEMO_002, as escalation for hardware investigation is required.
+  [2026-04-22 15:49:46 EDT] Diagnosis Agent: tool get_gpu_error_details invoked with input={"node_id": "gpu-host-demo-002"} output={"ecc_dbe_count": 0, "ecc_sbe_count": 0, "retired_pages_count": 0, "thermal_violations": 0, "xid_errors": [{"code": "PCIE_BUS_INACCESSIBLE", "timestamp": "2026-04-17T03:41:00Z"}]}
+  [2026-04-22 15:49:46 EDT] Diagnosis Agent: tool get_running_jobs invoked with input={"node_id": "gpu-host-demo-002"} output=[{"framework": "pytorch", "gpu_count": 1, "job_id": "job-pcie-001", "job_type": "training", "runtime_hours": 4.2, "status_summary": "Node instability detected.", "user": "team-c"}, {"framework": "tensorflow", "gpu_count": 1, "job_id": "job-pcie-002", "job_type": "training", "runtime_hours": 9.5, "status_summary": "Checkpoint available.", "user": "team-d"}, {"framework": "pytorch", "gpu_count": 2, "job_id": "job-pcie-003", "job_type": "training", "runtime_hours": 7.4, "status_summary": "High priority workload.", "user": "team-e"}, {"framework": "pytorch", "gpu_count": 1, "job_id": "job-pcie-004", "job_type": "inference", "runtime_hours": 2.3, "status_summary": "Latency may be impacted.", "user": "team-f"}, {"framework": "pytorch", "gpu_count": 2, "job_id": "job-pcie-005", "job_type": "training", "runtime_hours": 8.0, "status_summary": "Dependent on peer traffic.", "user": "team-c"}, {"framework": "tensorflow", "gpu_count": 1, "job_id": "job-pcie-006", "job_type": "training", "runtime_hours": 5.6, "status_summary": "Active on the affected node.", "user": "team-d"}]
+  [2026-04-22 15:49:46 EDT] Diagnosis Agent: tool search_knowledge_base invoked with input={"query": "PCIE_BUS_INACCESSIBLE PCIE Bus Inaccessible hardware gpu-host-demo-002 fired a PCIe mismatch alert one day before the bus became inaccessible."} output=[{"category": "hardware", "confidence_notes": "This alert is highly correlated with a severe host or device path failure, especially when it fires repeatedly.", "description": "A PCIe bus path to the GPU subsystem is inaccessible.", "false_positive_rate": 0.03, "issue_id": "PCIE_BUS_INACCESSIBLE", "keywords": ["pcie bus inaccessible", "tag and terminate", "pcie inaccessible", "bus inaccessible"], "severity": "P1", "typical_resolution": "Quarantine the node, terminate or drain workloads according to policy, and escalate to hardware operations for deeper inspection."}, {"category": "hardware", "confidence_notes": "Confidence rises when the mismatch co-occurs with bus accessibility failures or repeated fire counts.", "description": "PCIe link width or speed does not match the expected negotiated state.", "false_positive_rate": 0.08, "issue_id": "PCIE_LINK_WIDTH_AND_SPEED_MISMATCH", "keywords": ["pcie link width and current speed mismatch", "pcie mismatch", "link width mismatch", "current speed mismatch"], "severity": "P2", "typical_resolution": "Treat as a hardware degradation signal, correlate with related PCIe alerts, and schedule maintenance or terminate the node if combined with accessibility failures."}]
+  [2026-04-22 15:49:53 EDT] Diagnosis Agent: root cause=Recurring PCIe bus accessibility failure likely due to previous link width and speed mismatch. confidence=0.85
+  [2026-04-22 15:49:55 EDT] Orchestrator Agent: Routing to remediation for alert ALT-20260417034100-GPU_HOST_DEMO_002 after completing diagnosis, as a remediation plan is required.
+  [2026-04-22 15:49:57 EDT] Remediation Agent: tool draft_remediation_plan invoked with input={"action_type": "DRAIN_AND_DIAGNOSE", "node_id": "gpu-host-demo-002"} output={"action": "DRAIN AND DIAGNOSE", "action_type": "DRAIN_AND_DIAGNOSE", "approval_guidance": "Requires human approval during peak hours or when the blast radius exceeds policy thresholds.", "disruptive": true, "estimated_resolution": "2-4 hours for diagnostics; 24-48 hours if replacement is required.", "rollback_plan": "Uncordon the node and return workloads after diagnostics pass and post-check telemetry stays healthy for the observation window.", "steps": ["Cordon the node to prevent new scheduling.", "Wait for checkpoint-safe jobs to reach a safe pause point when available.", "Drain or reschedule the impacted jobs to alternate capacity.", "Run DCGM diagnostics and capture support bundles.", "Escalate to hardware operations if diagnostics fail or the alert recurs."]}
+  [2026-04-22 15:49:57 EDT] Remediation Agent: tool check_blast_radius invoked with input={"node_id": "gpu-host-demo-002"} output={"affected_job_count": 6, "affected_user_count": 4, "alternative_nodes_available": 1, "estimated_reschedule_time": "45-60 minutes"}
+  [2026-04-22 15:49:57 EDT] Remediation Agent: tool check_maintenance_window invoked with input={} output={"in_window": false, "next_window_hours": 4.0, "next_window_start": "2026-04-17T23:00:00Z"}
+  [2026-04-22 15:50:04 EDT] Remediation Agent: recommended DRAIN AND DIAGNOSE with approval=HUMAN-REQUIRED
+  [2026-04-22 15:50:05 EDT] Orchestrator Agent: Routing to finalize for alert ALT-20260417034100-GPU_HOST_DEMO_002 as remediation requires human approval.
