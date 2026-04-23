@@ -1,4 +1,4 @@
-"""Pydantic models for the Project 6 agentic GPU incident-response system."""
+"""Pydantic models for the Agentic GPU incident-response system."""
 
 from __future__ import annotations
 

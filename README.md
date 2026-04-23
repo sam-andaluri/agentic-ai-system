@@ -163,6 +163,12 @@ source .venv/bin/activate
 python agentic_system.py --interactive
 ```
 
+You can run one sample alert through the Agentic workflow without running the interactive loop by
+
+```bash
+python agentic_system.py --sample-alert recurring_xid_63_pattern
+```
+
 Current sample alert ids:
 
 - `xid_48_hardware_failure`
@@ -189,16 +195,12 @@ If you update the report markdown, regenerate the PDF with:
 pandoc Agentic_AI_System_Design_Report.md -o Agentic_AI_System_Design_Report.pdf
 ```
 
-## 11. Convert LangChain mermaid to svg
-
-To convert LangChain mermaid diagram from mmd to svg:
+## 11. Convert LangChain mermaid file to png
 
 Install mermaid-cli: https://github.com/mermaid-js/mermaid-cli
 
-The following command generates svg file in `outputs`
-
 ```bash
-mmdc -i outputs/langgraph_workflow.mmd
+mmdc -i outputs/langgraph_workflow.mmd -o outputs/langgraph_workflow.png -b white -s 2
 ```
 
 ## 12. Generate Final `requirements.txt`
