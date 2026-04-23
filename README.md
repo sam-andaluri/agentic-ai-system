@@ -68,7 +68,8 @@ From the project folder:
 
 ```bash
 cd agentic-ai-system
-uv venv .venv --python 3.13.5
+uv python install 3.11
+uv venv --python 3.11 .venv
 source .venv/bin/activate
 ```
 
@@ -205,7 +206,7 @@ mmdc -i outputs/langgraph_workflow.mmd -o outputs/langgraph_workflow.png -b whit
 
 ## 12. Generate Final `requirements.txt`
 
-After running the notebook or script in your final environment, regenerate the exact package versions:
+After running the script in your final environment, regenerate the exact package versions:
 
 ```bash
 uv pip freeze > requirements.txt
